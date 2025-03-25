@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TravelPlanner.Application.DTOs;
-using TravelPlanner.Core.Interfaces;
+using TravelPlanner.Core.Interfaces.Services;
 
 namespace TravelPlanner.Controllers
 {
@@ -8,14 +8,14 @@ namespace TravelPlanner.Controllers
     [Route("api/[controller]")]
     public class RecommendationsController : ControllerBase
     {
-        private readonly IRecommendationRepository _repository;
-        public RecommendationsController(IRecommendationRepository repository)
-            => _repository = repository;
+        private readonly IRecommendationService _service;
+        public RecommendationsController(IRecommendationService service)
+            => _service = service;
 
         [HttpPost]
         public async Task<IActionResult> GetRecommendations([FromBody] UserPreferences preferences)
         {
-            var destinations = await _repository.GetRecommendationsAsync(preferences);
+            var destinations = await _service.GetRecommendationsAsync(preferences);
             return Ok(destinations);
         }
     }

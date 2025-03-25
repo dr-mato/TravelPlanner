@@ -1,9 +1,9 @@
 ﻿using TravelPlanner.Application.DTOs;
 using TravelPlanner.Core.Entities;
 
-namespace TravelPlanner.Core.Interfaces
+namespace TravelPlanner.Core.Interfaces.Services
 {
-    public interface IRecommendationRepository
+    public interface IRecommendationService
     {
         Task<List<Destination>> GetRecommendationsAsync(UserPreferences preferences);
     }

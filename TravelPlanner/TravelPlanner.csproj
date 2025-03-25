@@ -7,10 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageReference Include="OpenAI" Version="2.1.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Infrastructure\Repositories\" />
     <Folder Include="Tests\" />
   </ItemGroup>
 

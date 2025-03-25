@@ -1,12 +1,10 @@
-using TravelPlanner.Infrastructure.Repositories;
 using TravelPlanner.Application.Services;
-using TravelPlanner.Core.Interfaces;
+using TravelPlanner.Core.Interfaces.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add layers
-builder.Services.AddScoped<IRecommendationRepository, OpenAIRepository>();
-builder.Services.AddScoped<RecommendationService>();
+builder.Services.AddScoped<IRecommendationService, OpenAIService>();
 
 builder.Services.AddHttpClient();
 builder.Services.AddControllers();
