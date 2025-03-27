@@ -20,23 +20,41 @@ public class OpenAIService : IRecommendationService
 
     public async Task<List<Destination>> GetRecommendationsAsync(UserPreferences preferences)
     {
-        var prompt = $"""
-            Act as a travel expert. Recommend 3 destinations for:
-            - Budget: {preferences.Budget}
-            - Interests: {string.Join(", ", preferences.Interests)}
-            - Travel Style: {preferences.TravelStyle}
-            - Weather: {preferences.WeatherPreference ?? "any"}
+        var prompt = $@"
+        Act as a travel expert. Recommend 3 destinations for:
+        - Budget: {preferences.Budget}
+        - Interests: {string.Join(",", preferences.Interests)}
+        - Travel Style: {preferences.TravelStyle}
+        - Weather: {preferences.WeatherPreference ?? "any"}
 
-            Format the response as JSON with:
-            name, country, summary, budgetEstimate, weatherMatch.
-            """
-        ;
+        Format the response as a JSON array with each object containing:
+        - Name (string)
+        - Country (string)
+        - Summary (string)
+        - BudgetEstimate (number, without quotes)
+        - WeatherMatch (boolean, true or false)
+
+        Example response:
+        {{
+          ""Name"": ""Bali, Indonesia"",
+          ""Country"": ""Indonesia"",
+          ""Summary"": ""A tropical paradise..."",
+          ""BudgetEstimate"": 5000,
+          ""WeatherMatch"": true
+        }}
+        ";
 
         ChatClient chatClient = new(model: "gpt-4", apiKey: _apiKey);
         ChatCompletion completion = await chatClient.CompleteChatAsync(prompt);
 
         string response = completion.Content[0].Text;
+        Console.WriteLine(response ?? "No response data");
 
-        return JsonSerializer.Deserialize<List<Destination>>(response) ?? new List<Destination>();
+        var options = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };
+
+        return JsonSerializer.Deserialize<List<Destination>>(response, options) ?? new List<Destination>();
     }
 }
