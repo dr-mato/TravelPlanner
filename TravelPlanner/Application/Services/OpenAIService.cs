@@ -6,7 +6,7 @@ using TravelPlanner.Core.Interfaces.Services;
 
 namespace TravelPlanner.Application.Services;
 
-public class OpenAIService : IRecommendationService
+public class OpenAIService : IOpenAIService
 {
     private readonly HttpClient _httpClient;
     private readonly string _apiKey;

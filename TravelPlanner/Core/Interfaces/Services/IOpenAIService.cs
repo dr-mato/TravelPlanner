@@ -3,7 +3,7 @@ using TravelPlanner.Core.Entities;
 
 namespace TravelPlanner.Core.Interfaces.Services
 {
-    public interface IRecommendationService
+    public interface IOpenAIService
     {
         Task<List<Destination>> GetRecommendationsAsync(UserPreferences preferences);
     }
