@@ -8,8 +8,8 @@ namespace TravelPlanner.Controllers
     [Route("api/[controller]")]
     public class RecommendationsController : ControllerBase
     {
-        private readonly IRecommendationService _service;
-        public RecommendationsController(IRecommendationService service)
+        private readonly IOpenAIService _service;
+        public RecommendationsController(IOpenAIService service)
             => _service = service;
 
         [HttpPost]

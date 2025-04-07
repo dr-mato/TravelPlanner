@@ -7,7 +7,7 @@ namespace TravelPlanner.Infrastructure.Data
     {
         public DataDbContext(DbContextOptions<DataDbContext> options) : base(options) { }
 
-        public DbSet<Destination> Destinations;
-        public DbSet<Weather> Weathers;
+        public DbSet<Destination> Destinations { get; set; }
+        public DbSet<Weather> Weathers { get; set; }
     }
 }

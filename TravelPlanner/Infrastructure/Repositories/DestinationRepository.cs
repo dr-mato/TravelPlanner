@@ -1,10 +1,12 @@
 ﻿using TravelPlanner.Core.Entities;
 using TravelPlanner.Core.Interfaces.Repositories;
+using TravelPlanner.Infrastructure.Data;
 
 namespace TravelPlanner.Infrastructure.Repositories
 {
-    public class DestinationRepository : IDestinationRepository
+    public class DestinationRepository : IDestinationRepository //IRepository<Destination>
     {
+        //public DestinationRepository(DataDbContext dbContext) : base(dbContext) { }
         public Task<List<Destination>> GetAllAsync()
         {
             throw new NotImplementedException();
