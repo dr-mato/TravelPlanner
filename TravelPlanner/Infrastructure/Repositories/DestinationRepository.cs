@@ -1,40 +1,62 @@
-﻿using TravelPlanner.Core.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using TravelPlanner.Core.Entities;
 using TravelPlanner.Core.Interfaces.Repositories;
 using TravelPlanner.Infrastructure.Data;
 
 namespace TravelPlanner.Infrastructure.Repositories
 {
-    public class DestinationRepository : IDestinationRepository //IRepository<Destination>
+    public class DestinationRepository : Repository<Destination>, IDestinationRepository
     {
-        //public DestinationRepository(DataDbContext dbContext) : base(dbContext) { }
-        public Task<List<Destination>> GetAllAsync()
+        public DestinationRepository(DataDbContext dbContext) : base(dbContext) { }
+
+        public async Task<List<Destination>> GetDestinationByCountryAsync(string country)
         {
-            throw new NotImplementedException();
+            return await _context.Set<Destination>().Where(d => d.Country == country).ToListAsync()
+                ?? throw new KeyNotFoundException($"The country you were looking for ({country}) was not in the database");
         }
 
-        public Task<Destination> GetDestinationByCountryAsync(string country)
+        public async Task<List<Destination>> GetDestinationByNameAsync(string name)
         {
-            throw new NotImplementedException();
+            return await _context.Set<Destination>().Where(d => d.Name == name).ToListAsync()
+                ?? throw new KeyNotFoundException($"The destination you were looking for ({name}) was not in the database");
         }
 
-        public Task<Destination> GetDestinationByNameAsync(string name)
+        public async Task<Destination> GetTheMostExpensiveDestinationAsync()
         {
-            throw new NotImplementedException();
+            return await _context.Set<Destination>()
+                .OrderByDescending(d => d.BudgetEstimate)
+                .FirstOrDefaultAsync()
+                ?? throw new KeyNotFoundException("No destinations found in the database.");
         }
 
-        public Task<Destination> GetTheMostExpensiveDestinationAsync()
+        public async Task<Destination> GetTheMostExpensiveDestinationByCoutryAsync(string country)
         {
-            throw new NotImplementedException();
+            return await _context.Set<Destination>()
+                .Where(d => d.Country == country)
+                .OrderByDescending(d => d.BudgetEstimate)
+                .FirstOrDefaultAsync()
+                ?? throw new KeyNotFoundException($"The country you were looking for ({country}) was not in the database");
         }
 
-        public Task<Destination> GetTheMostExpensiveDestinationByCoutryAsync(string country)
+        public async Task<(string name, int amount)> GetTheMostPopularDestinationAsync()
         {
-            throw new NotImplementedException();
+            var popularDestination = await _context.Set<Destination>()
+                .GroupBy(d => d.Name)
+                .Select(g => new
+                {
+                    Name = g.Key,
+                    Count = g.Count()
+                })
+                .OrderByDescending(g => g.Count)
+                .FirstOrDefaultAsync()
+                ?? throw new KeyNotFoundException("No destinations found in the database.");
+            
+            return (popularDestination.Name, popularDestination.Count);
         }
 
-        public Task<Destination> GetTheMostPopularDestinationAsync()
+        public async Task SaveChangesAsync()
         {
-            throw new NotImplementedException();
+            await _context.SaveChangesAsync();
         }
     }
 }

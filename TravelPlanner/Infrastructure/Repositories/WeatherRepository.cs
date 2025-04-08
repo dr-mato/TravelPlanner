@@ -1,23 +1,42 @@
-﻿using TravelPlanner.Core.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using TravelPlanner.Core.Entities;
 using TravelPlanner.Core.Interfaces.Repositories;
+using TravelPlanner.Infrastructure.Data;
 
 namespace TravelPlanner.Infrastructure.Repositories
 {
-    public class WeatherRepository : IWeatherRepository
+    public class WeatherRepository : Repository<Weather>, IWeatherRepository
     {
-        public Task AddWeatherDataAsync(List<Weather> data)
+        public WeatherRepository(DataDbContext context) : base(context) { }
+
+        public async Task AddWeatherDataAsync(List<Weather> data)
         {
-            throw new NotImplementedException();
+            foreach(var weather in data)
+            {
+                await AddAsync(weather);
+            }
         }
 
-        public Task<List<Weather>> GetExistingWeatherAsync(string location, DateTime startDate, DateTime endDate)
+        public async Task<List<Weather>> GetExistingWeatherAsync(string location, DateTime startDate, DateTime endDate)
         {
-            throw new NotImplementedException();
+            return await _context.Set<Weather>().Where(d => d.Location == location && d.Date >= startDate && d.Date <= endDate).ToListAsync();
         }
 
-        public Task<bool> HasAllDataForRangeAsync(string location, DateTime startDate, DateTime endDate)
+        public async Task<bool> HasAllDataForRangeAsync(string location, DateTime startDate, DateTime endDate)
         {
-            throw new NotImplementedException();
+            var date = startDate;
+
+            while(date <= endDate)
+            {
+                var weather = await _context.Set<Weather>().Where(d => d.Location == location && d.Date == date).FirstOrDefaultAsync();
+                if (weather == null)
+                {
+                    return false;
+                }
+                date = date.AddDays(1);
+            }
+
+            return true;
         }
     }
 }

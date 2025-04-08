@@ -2,7 +2,7 @@
 
 namespace TravelPlanner.Core.Interfaces.Repositories
 {
-    public interface IWeatherRepository
+    public interface IWeatherRepository : IRepository<Weather>
     {
         Task<List<Weather>> GetExistingWeatherAsync(string location, DateTime startDate, DateTime endDate);
         Task AddWeatherDataAsync(List<Weather> data);

@@ -3,6 +3,7 @@ using TravelPlanner.Application.DTOs;
 using System.Text.Json;
 using OpenAI.Chat;
 using TravelPlanner.Core.Interfaces.Services;
+using TravelPlanner.Core.Interfaces.Repositories;
 
 namespace TravelPlanner.Application.Services;
 
@@ -10,12 +11,14 @@ public class OpenAIService : IOpenAIService
 {
     private readonly HttpClient _httpClient;
     private readonly string _apiKey;
+    private readonly IDestinationRepository _destinationRepository;
 
-    public OpenAIService(HttpClient httpClient, IConfiguration config)
+    public OpenAIService(HttpClient httpClient, IConfiguration config, IDestinationRepository destinationRepository)
     {
         _httpClient = httpClient;
         _apiKey = config["OpenAI:ApiKey"]!;
         _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_apiKey}");
+        _destinationRepository = destinationRepository;
     }
 
     public async Task<List<Destination>> GetRecommendationsAsync(UserPreferences preferences)
@@ -55,6 +58,14 @@ public class OpenAIService : IOpenAIService
             PropertyNameCaseInsensitive = true
         };
 
-        return JsonSerializer.Deserialize<List<Destination>>(response, options) ?? new List<Destination>();
+        var destinations = JsonSerializer.Deserialize<List<Destination>>(response, options) ?? new List<Destination>();
+
+        foreach(var destination in destinations)
+        {
+            await _destinationRepository.AddAsync(destination);
+            await _destinationRepository.SaveChangesAsync();
+        }
+
+        return destinations;
     }
 }

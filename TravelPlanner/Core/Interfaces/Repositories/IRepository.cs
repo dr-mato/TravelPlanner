@@ -1,6 +1,6 @@
 ﻿namespace TravelPlanner.Core.Interfaces.Repositories
 {
-    public interface IRepository<TEntity>
+    public interface IRepository<TEntity> where TEntity : class
     {
         Task<IEnumerable<TEntity>> GetAllAsync();
 
@@ -8,10 +8,10 @@
 
         Task AddAsync(TEntity entity);
 
-        Task DeleteAsync(TEntity entity);
+        void Delete(TEntity entity);
 
         Task DeleteByIdAsync(int id);
 
-        Task UpdateAsync(TEntity entity);
+        void Update(TEntity entity);
     }
 }
