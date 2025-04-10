@@ -1,12 +1,21 @@
 using Microsoft.EntityFrameworkCore;
 using TravelPlanner.Application.Services;
+using TravelPlanner.Core.Interfaces.Repositories;
 using TravelPlanner.Core.Interfaces.Services;
 using TravelPlanner.Infrastructure.Data;
+using TravelPlanner.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add layers
+builder.Services.AddDbContext<DataDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<IDestinationRepository, DestinationRepository>();
+builder.Services.AddScoped<IWeatherRepository, WeatherRepository>();
+
 builder.Services.AddScoped<IOpenAIService, OpenAIService>();
+builder.Services.AddScoped<IWeatherService, WeatherService>();
 
 builder.Services.AddHttpClient();
 builder.Services.AddControllers();
@@ -21,9 +30,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-builder.Services.AddDbContext<DataDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
 app.UseHttpsRedirection();
 app.MapControllers();
-app.Run();
+await app.RunAsync();

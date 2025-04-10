@@ -13,8 +13,20 @@ namespace TravelPlanner.Infrastructure.Repositories
         {
             foreach(var weather in data)
             {
-                await AddAsync(weather);
+                var existingWeather = await _context.Set<Weather>().
+                    FirstOrDefaultAsync(w => w.Location == weather.Location && w.Date == weather.Date);
+
+                if (existingWeather != null)
+                {
+                    existingWeather.Temperature = weather.Temperature;
+                    Update(existingWeather);
+                }
+                else
+                {
+                    await AddAsync(weather);
+                }
             }
+            await _context.SaveChangesAsync();
         }
 
         public async Task<List<Weather>> GetExistingWeatherAsync(string location, DateTime startDate, DateTime endDate)
