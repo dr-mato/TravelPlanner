@@ -57,7 +57,6 @@ namespace TravelPlanner.Application.Services
 
             var content = await response.Content.ReadAsStringAsync();
             var jsonDocument = JsonDocument.Parse(content);
-            Console.WriteLine(jsonDocument);
 
             var result = new Dictionary<DateTime, double>();
 
