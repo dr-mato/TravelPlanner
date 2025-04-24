@@ -13,7 +13,9 @@ namespace TravelPlanner.Infrastructure.Repositories
 
         public async Task<IEnumerable<Flight>> GetSameFlightInfoAsync(DateTime departureDate, string origin, string destination)
         {
-            return await _context.Set<Flight>().Where(f => f.DepartureDate == departureDate && f.Origin == origin && f.Destination == destination).ToListAsync();
+            return await _context.Set<Flight>()
+                .Where(f => f.DepartureDate == departureDate && f.Origin == origin && f.Destination == destination)
+                .ToListAsync();
         }
 
         public Task<IEnumerable<Flight>> GetFlightsByDepartureDateAsync(DateTime departureDate)

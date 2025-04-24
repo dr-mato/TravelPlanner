@@ -13,9 +13,12 @@ builder.Services.AddDbContext<DataDbContext>(options =>
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IDestinationRepository, DestinationRepository>();
 builder.Services.AddScoped<IWeatherRepository, WeatherRepository>();
+builder.Services.AddScoped<IAirportInformationRepository, AirportInformationRepository>();
+builder.Services.AddScoped<IFlightRepository, FlightRepository>();
 
 builder.Services.AddScoped<IOpenAIService, OpenAIService>();
 builder.Services.AddScoped<IWeatherService, WeatherService>();
+builder.Services.AddScoped<IFlightService, FlightService>();
 
 builder.Services.AddHttpClient();
 builder.Services.AddControllers();
