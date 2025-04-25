@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Globalization;
+using System.Text.Json;
 using TravelPlanner.Application.DTOs;
 using TravelPlanner.Core.Entities;
 using TravelPlanner.Core.Interfaces.Repositories;
@@ -29,7 +30,7 @@ namespace TravelPlanner.Application.Services
             var results = new List<Flight>();
 
             var alreadySearchedDeparture = await _flightRepository.GetSameFlightInfoAsync(flight.DepartureDate, flight.Origin, flight.Destination);
-            var alreadySearchedReturn = await _flightRepository.GetSameFlightInfoAsync(flight.DepartureDate, flight.Origin, flight.Destination);
+            var alreadySearchedReturn = await _flightRepository.GetSameFlightInfoAsync(flight.ReturnDate, flight.Origin, flight.Destination);
 
             var originAirport = await _airportInformationRepository.GetAirportCodeAndIdAsync(flight.Origin);
             var destinationAirport = await _airportInformationRepository.GetAirportCodeAndIdAsync(flight.Destination);
@@ -48,8 +49,8 @@ namespace TravelPlanner.Application.Services
 
                 var content = await response.Content.ReadAsStringAsync();
                 var jsonDocument = JsonDocument.Parse(content);
-                var airportData = jsonDocument.RootElement.GetProperty("inputSuggest").GetProperty("0").
-                    GetProperty("RelevantFlightParams");
+                var airportData = jsonDocument.RootElement.GetProperty("inputSuggest")[0].GetProperty("navigation")
+                    .GetProperty("relevantFlightParams");
 
                 originAirportCode = airportData.GetProperty("skyId").GetString();
                 originAirportId = airportData.GetProperty("entityId").GetString();
@@ -62,8 +63,10 @@ namespace TravelPlanner.Application.Services
                 };
 
                 await _airportInformationRepository.AddAsync(airportInformation);
+                await _airportInformationRepository.SaveChangesAsync();
 
             }
+
             if (destinationAirport is null)
             {
                 var url = $"https://skyscanner89.p.rapidapi.com/flights/auto-complete?query={flight.Destination}";
@@ -73,8 +76,8 @@ namespace TravelPlanner.Application.Services
 
                 var content = await response.Content.ReadAsStringAsync();
                 var jsonDocument = JsonDocument.Parse(content);
-                var airportData = jsonDocument.RootElement.GetProperty("inputSuggest").GetProperty("0").
-                    GetProperty("RelevantFlightParams");
+                var airportData = jsonDocument.RootElement.GetProperty("inputSuggest")[0].GetProperty("navigation")
+                    .GetProperty("relevantFlightParams");
 
                 destinationAirportCode = airportData.GetProperty("skyId").GetString();
                 destinationAirportId = airportData.GetProperty("entityId").GetString();
@@ -87,10 +90,11 @@ namespace TravelPlanner.Application.Services
                 };
 
                 await _airportInformationRepository.AddAsync(airportInformation);
+                await _airportInformationRepository.SaveChangesAsync();
 
             }
 
-            if (alreadySearchedDeparture is null)
+            if (!alreadySearchedDeparture.Any())
             {
 
                 var url = $"https://skyscanner89.p.rapidapi.com/flights/one-way/list?origin={originAirportCode}" +
@@ -100,7 +104,15 @@ namespace TravelPlanner.Application.Services
                 var response = await _httpClient.GetAsync(url);
                 response.EnsureSuccessStatusCode();
 
-                // Get flight entity from response
+                var content = await response.Content.ReadAsStringAsync();
+                
+                using var jsonDocument = JsonDocument.Parse(content);
+                
+                var flightData = GetBestFlightMatch(jsonDocument, flight.DepartureDate);
+                
+                results.Add(flightData);
+                await _flightRepository.AddAsync(flightData);
+                await _flightRepository.SaveChangesAsync();
             }
             else
             {
@@ -109,7 +121,8 @@ namespace TravelPlanner.Application.Services
                     results.Add(databaseFlight);
                 }
             }
-            if (alreadySearchedReturn is null)
+
+            if (!alreadySearchedReturn.Any())
             {
 
 
@@ -121,12 +134,14 @@ namespace TravelPlanner.Application.Services
                 response.EnsureSuccessStatusCode();
 
                 var content = await response.Content.ReadAsStringAsync();
-                var jsonDocument = JsonDocument.Parse(content);
 
-                Console.WriteLine(jsonDocument.RootElement.ToString());
+                using var jsonDocument = JsonDocument.Parse(content);
 
+                var flightData = GetBestFlightMatch(jsonDocument, flight.ReturnDate);
 
-                // Get flight entity from response
+                results.Add(flightData);
+                await _flightRepository.AddAsync(flightData);
+                await _flightRepository.SaveChangesAsync();
             }
             else
             {
@@ -136,6 +151,64 @@ namespace TravelPlanner.Application.Services
                 }
             }
             return results;
+        }
+
+        public Flight GetBestFlightMatch(JsonDocument jsonDocument, DateTime targetDate)
+        {
+            // Track best matches
+            Flight bestMatch = null;
+            int closestDayDifference = int.MaxValue;
+            decimal lowestPrice = decimal.MaxValue;
+
+            // Get the results array
+            var results = jsonDocument.RootElement
+                .GetProperty("data")
+                .GetProperty("flightQuotes")
+                .GetProperty("results");
+
+            foreach (JsonElement flight in results.EnumerateArray())
+            {
+                // Extract ID to get date information
+                string id = flight.GetProperty("id").GetString();
+                string[] idParts = id.Split('*');
+
+                // Parse the departure date from ID (format: 20250526)
+                string departureDateStr = idParts[4];
+                DateTime flightDate = DateTime.ParseExact(departureDateStr, "yyyyMMdd", CultureInfo.InvariantCulture);
+
+                // Get the price
+                decimal price = flight.GetProperty("content").GetProperty("rawPrice").GetDecimal();
+
+                // Calculate how close this date is to our target
+                int dayDifference = Math.Abs((flightDate - targetDate).Days);
+
+                // Determine if this is a better match
+                if (dayDifference < closestDayDifference ||
+                    (dayDifference == closestDayDifference && price < lowestPrice))
+                {
+                    closestDayDifference = dayDifference;
+                    lowestPrice = price;
+
+                    // Extract remaining flight details
+                    string origin = idParts[2];
+                    string destination = idParts[3];
+                    string carrierCode = idParts[6];
+
+                    // Create the flight object
+                    bestMatch = new Flight
+                    {
+                        FlightNumber = $"{carrierCode}{new Random().Next(100, 999)}", // Simple flight number
+                        Origin = origin,
+                        Destination = destination,
+                        DepartureDate = flightDate,
+                        ReturnDate = flightDate.AddDays(7), // need to remove this
+                        Airline = string.Empty, // need to remove this
+                        Price = price
+                    };
+                }
+            }
+
+            return bestMatch;
         }
     }
 }

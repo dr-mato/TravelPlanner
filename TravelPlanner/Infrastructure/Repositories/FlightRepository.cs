@@ -18,6 +18,11 @@ namespace TravelPlanner.Infrastructure.Repositories
                 .ToListAsync();
         }
 
+        public Task SaveChangesAsync()
+        {
+            return _context.SaveChangesAsync();
+        }
+
         public Task<IEnumerable<Flight>> GetFlightsByDepartureDateAsync(DateTime departureDate)
         {
             throw new NotImplementedException();
