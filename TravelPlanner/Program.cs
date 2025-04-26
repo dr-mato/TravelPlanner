@@ -15,10 +15,13 @@ builder.Services.AddScoped<IDestinationRepository, DestinationRepository>();
 builder.Services.AddScoped<IWeatherRepository, WeatherRepository>();
 builder.Services.AddScoped<IAirportInformationRepository, AirportInformationRepository>();
 builder.Services.AddScoped<IFlightRepository, FlightRepository>();
+builder.Services.AddScoped<IHotelRepository, HotelRepository>();
+builder.Services.AddScoped<IHotelDestinationRepository, HotelDestinationRepository>();
 
 builder.Services.AddScoped<IOpenAIService, OpenAIService>();
 builder.Services.AddScoped<IWeatherService, WeatherService>();
 builder.Services.AddScoped<IFlightService, FlightService>();
+builder.Services.AddScoped<IHotelService, HotelService>();
 
 builder.Services.AddHttpClient();
 builder.Services.AddControllers();

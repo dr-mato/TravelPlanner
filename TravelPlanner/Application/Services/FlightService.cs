@@ -4,7 +4,6 @@ using TravelPlanner.Application.DTOs;
 using TravelPlanner.Core.Entities;
 using TravelPlanner.Core.Interfaces.Repositories;
 using TravelPlanner.Core.Interfaces.Services;
-using static System.Net.WebRequestMethods;
 
 namespace TravelPlanner.Application.Services
 {
@@ -15,7 +14,8 @@ namespace TravelPlanner.Application.Services
         private readonly IFlightRepository _flightRepository;
         private readonly IAirportInformationRepository _airportInformationRepository;
 
-        public FlightService(HttpClient httpClient, IConfiguration config, IFlightRepository flightRepository, IAirportInformationRepository airportInformationRepository)
+        public FlightService(HttpClient httpClient, IConfiguration config, IFlightRepository flightRepository,
+            IAirportInformationRepository airportInformationRepository)
         {
             _httpClient = httpClient;
             _apiKey = config["Skyscanner:ApiKey"]!;
@@ -153,7 +153,7 @@ namespace TravelPlanner.Application.Services
             return results;
         }
 
-        public Flight GetBestFlightMatch(JsonDocument jsonDocument, DateTime targetDate)
+        private Flight GetBestFlightMatch(JsonDocument jsonDocument, DateTime targetDate)
         {
             // Track best matches
             Flight bestMatch = null;

@@ -5,18 +5,15 @@ using TravelPlanner.Infrastructure.Data;
 
 namespace TravelPlanner.Infrastructure.Repositories
 {
-    public class HotelRepository : Repository<Hotel>, IHotelRepository
+    public class HotelDestinationRepository : Repository<HotelDestination>, IHotelDestinationRepository
     {
-
-        public HotelRepository(DataDbContext context) : base(context)
+        public HotelDestinationRepository(DataDbContext context) : base(context)
         {
         }
 
-        public async Task<List<Hotel>> GetHotelsByCity(string city)
+        public async Task<HotelDestination> GetHotelInformationByCity(string city)
         {
-            return await _context.Set<Hotel>()
-                .Where(h => h.City == city)
-                .ToListAsync();
+            return await _context.Set<HotelDestination>().Where(hotel => hotel.City == city).FirstOrDefaultAsync();
         }
 
         public async Task SaveChangesAsync()

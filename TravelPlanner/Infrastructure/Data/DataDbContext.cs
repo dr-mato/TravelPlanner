@@ -11,5 +11,7 @@ namespace TravelPlanner.Infrastructure.Data
         public DbSet<Weather> Weathers { get; set; }
         public DbSet<Flight> Flights { get; set; }
         public DbSet<AirportInformation> AirportInformations { get; set; }
+        public DbSet<Hotel> Hotels { get; set; }
+        public DbSet<HotelDestination> HotelDestinations { get; set; }
     }
 }
