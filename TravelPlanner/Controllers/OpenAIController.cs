@@ -6,10 +6,10 @@ namespace TravelPlanner.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class RecommendationsController : ControllerBase
+    public class OpenAIController : ControllerBase
     {
         private readonly IOpenAIService _service;
-        public RecommendationsController(IOpenAIService service)
+        public OpenAIController(IOpenAIService service)
             => _service = service;
 
         [HttpPost]

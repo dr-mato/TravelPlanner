@@ -12,10 +12,10 @@ namespace TravelPlanner.Infrastructure.Repositories
         {
         }
 
-        public async Task<List<Hotel>> GetHotelsByCity(string city)
+        public async Task<List<Hotel>> GetHotelsByCityAndDate(string city, DateTime arrival, DateTime departure)
         {
             return await _context.Set<Hotel>()
-                .Where(h => h.City == city)
+                .Where(h => h.City == city && h.CheckInDate == arrival && h.CheckOutDate == departure)
                 .ToListAsync();
         }
 
