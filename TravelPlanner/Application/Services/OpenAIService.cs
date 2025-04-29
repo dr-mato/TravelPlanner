@@ -12,13 +12,20 @@ public class OpenAIService : IOpenAIService
     private readonly HttpClient _httpClient;
     private readonly string _apiKey;
     private readonly IDestinationRepository _destinationRepository;
+    private readonly IWeatherRepository _weatherRepository;
+    private readonly IFlightRepository _flightRepository;
+    private readonly IHotelRepository _hotelRepository;
 
-    public OpenAIService(HttpClient httpClient, IConfiguration config, IDestinationRepository destinationRepository)
+    public OpenAIService(HttpClient httpClient, IConfiguration config, IDestinationRepository destinationRepository,
+        IWeatherRepository weatherRepository, IFlightRepository flightRepository, IHotelRepository hotelRepository)
     {
         _httpClient = httpClient;
         _apiKey = config["OpenAI:ApiKey"]!;
         _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_apiKey}");
         _destinationRepository = destinationRepository;
+        _weatherRepository = weatherRepository;
+        _flightRepository = flightRepository;
+        _hotelRepository = hotelRepository;
     }
 
     public async Task<List<Destination>> GetRecommendationsAsync(UserPreferences preferences)
@@ -68,4 +75,67 @@ public class OpenAIService : IOpenAIService
 
         return destinations;
     }
+
+    public async Task<List<DailyPlan>> GetDailyPlanAsync(DailyPlanRequest request)
+    {
+        var prompt = $@"
+        You are an expert travel planner. Based on the following information, create a detailed daily plan for the user:
+
+        - Destination: {request.Destination.Name}, {request.Destination.Country}
+        - Budget Estimate: {request.Destination.BudgetEstimate}
+        - Hotel: {request.Hotel.Name}, priced at {request.Hotel.Price}{request.Hotel.Currency}
+        - Flights: {string.Join(", ", request.Flights.Select(f => $"{f.FlightNumber} costing {f.Price}"))}
+        - Daily Weather Forecast: {string.Join(", ", request.Weathers.Select(w => $"{w.Date.ToShortDateString()} - {w.Temperature}°C"))}
+
+        Notes:
+        - The user's total budget includes the cost of the flight and hotel, so you should consider how much money remains for daily activities.
+        - Plan one set of activities per day, considering the weather conditions.
+        - Be creative but realistic with the activities and advice.
+        - Assume the user is staying at the hotel provided.
+
+        Format your response as a JSON array, where each element represents a day's plan with the following structure:
+        {{
+            ""DayNumber"": int,      // Day number starting from 1
+            ""MorningActivity"": string,  // Activity planned for the morning
+            ""AfternoonActivity"": string, // Activity planned for the afternoon
+            ""EveningActivity"": string,   // Activity planned for the evening
+            ""Notes"": string             // Any important notes, tips, or advice
+        }}
+
+        Example response:
+        [
+            {{
+            ""DayNumber"": 1,
+            ""MorningActivity"": ""Visit the city museum"",
+            ""AfternoonActivity"": ""Boat tour along the river"",
+            ""EveningActivity"": ""Dinner at a recommended seafood restaurant"",
+            ""Notes"": ""Expect sunny weather, wear comfortable shoes.""
+            }},
+            {{
+            ""DayNumber"": 2,
+            ""MorningActivity"": ""Hiking trip to nearby hills"",
+            ""AfternoonActivity"": ""Relax at the hotel spa"",
+            ""EveningActivity"": ""Explore the local night market"",
+            ""Notes"": ""Possibility of light rain in the evening, bring an umbrella.""
+            }}
+        ]
+        ";
+
+
+        ChatClient chatClient = new(model: "gpt-4", apiKey: _apiKey);
+           ChatCompletion completion = await chatClient.CompleteChatAsync(prompt);
+    
+           string response = completion.Content[0].Text;
+           Console.WriteLine(response ?? "No response data");
+    
+           var options = new JsonSerializerOptions
+           {
+            PropertyNameCaseInsensitive = true
+           };
+    
+           var dailyPlan = JsonSerializer.Deserialize<List<DailyPlan>>(response, options) ?? new List<DailyPlan>();
+    
+           return dailyPlan;
+    }
 }
+

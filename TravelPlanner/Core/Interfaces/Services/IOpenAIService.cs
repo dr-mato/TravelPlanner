@@ -6,5 +6,6 @@ namespace TravelPlanner.Core.Interfaces.Services
     public interface IOpenAIService
     {
         Task<List<Destination>> GetRecommendationsAsync(UserPreferences preferences);
+        Task<List<DailyPlan>> GetDailyPlanAsync(DailyPlanRequest request);
     }
 }
