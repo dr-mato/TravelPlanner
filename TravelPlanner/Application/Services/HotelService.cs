@@ -62,36 +62,35 @@ namespace TravelPlanner.Application.Services
 
                 var content = await response.Content.ReadAsStringAsync();
                 var jsonDocument = JsonDocument.Parse(content);
-                Console.WriteLine(jsonDocument.RootElement.ToString());
                 var hotelInfo = jsonDocument.RootElement.GetProperty("data").GetProperty("hotels");
 
-                foreach (var hotel in hotelInfo.EnumerateArray())
+                foreach (var hotel in hotelInfo.EnumerateArray().Take(3))
                 {
                     var hotelDetails = new Hotel
                     {
                         Name = hotel.GetProperty("property").GetProperty("name").ToString(),
                         StarRating = hotel.GetProperty("property").GetProperty("accuratePropertyClass").GetInt32(),
                         Price = hotel.GetProperty("property").GetProperty("priceBreakdown")
-                        .GetProperty("grossPrice").GetProperty("value").GetDecimal(),
+                            .GetProperty("grossPrice").GetProperty("value").GetDecimal(),
                         Currency = hotel.GetProperty("property").GetProperty("priceBreakdown")
-                        .GetProperty("grossPrice").GetProperty("currency").ToString(),
+                            .GetProperty("grossPrice").GetProperty("currency").ToString(),
                         ReviewScore = hotel.GetProperty("property")
-                        .GetProperty("reviewScore").GetDecimal(),
+                            .GetProperty("reviewScore").GetDecimal(),
                         ReviewQualityWord = hotel.GetProperty("property")
-                        .GetProperty("reviewScoreWord").ToString(),
+                            .GetProperty("reviewScoreWord").ToString(),
                         NumberOfReviews = hotel.GetProperty("property")
-                        .GetProperty("reviewCount").GetInt32(),
+                            .GetProperty("reviewCount").GetInt32(),
                         City = request.City,
                         LocationArea = hotel.GetProperty("property")
-                        .GetProperty("wishlistName").ToString(),
+                            .GetProperty("wishlistName").ToString(),
                         CheckInDate = request.ArrivalDate,
                         CheckOutDate = request.DepartureDate
                     };
 
                     results.Add(hotelDetails);
                     await _hotelRepository.AddAsync(hotelDetails);
-                    await _hotelRepository.SaveChangesAsync();
                 }
+                await _hotelRepository.SaveChangesAsync();
             }
             else
             {

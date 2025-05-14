@@ -13,7 +13,6 @@ namespace TravelPlanner.Core.Entities
         public string Destination { get; set; }
         public DateTime DepartureDate { get; set; }
         public DateTime ReturnDate { get; set; } //need to remove this
-        [Required]
         public string Airline { get; set; } //need to remove this
         public decimal Price { get; set; }
     }
