@@ -34,11 +34,11 @@ namespace TravelPlanner.Application.Services
                 var request = new HttpRequestMessage(HttpMethod.Post, "https://test.api.amadeus.com/v1/security/oauth2/token")
                 {
                     Content = new FormUrlEncodedContent(new[]
-    {
+                    {
                     new KeyValuePair<string, string>("grant_type", "client_credentials"),
                     new KeyValuePair<string, string>("client_id", _apiKey),
                     new KeyValuePair<string, string>("client_secret", _apiSecret),
-                })
+                    })
                 };
 
                 var response = await _httpClient.SendAsync(request);

@@ -14,5 +14,6 @@ namespace TravelPlanner.Infrastructure.Data
         public DbSet<Hotel> Hotels { get; set; }
         public DbSet<HotelDestination> HotelDestinations { get; set; }
         public DbSet<AmadeusToken> AmadeusTokens { get; set; }
+        public DbSet<AITA> AITAs { get; set; }
     }
 }

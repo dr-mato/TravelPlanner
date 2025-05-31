@@ -29,12 +29,14 @@ builder.Services.AddScoped<IFlightRepository, FlightRepository>();
 builder.Services.AddScoped<IHotelRepository, HotelRepository>();
 builder.Services.AddScoped<IHotelDestinationRepository, HotelDestinationRepository>();
 builder.Services.AddScoped<IAmadeusTokenRepository, AmadeusTokenRepository>();
+builder.Services.AddScoped<IAITARepository, AITARepository>();
 
 builder.Services.AddScoped<IOpenAIService, OpenAIService>();
 builder.Services.AddScoped<IWeatherService, WeatherService>();
 builder.Services.AddScoped<IFlightService, FlightService>();
 builder.Services.AddScoped<IHotelService, HotelService>();
 builder.Services.AddScoped<IAmadeusTokenGenerationService, AmadeusTokenGenerationService>();
+builder.Services.AddScoped<IAITAService, AITAService>();
 
 builder.Services.AddHttpClient();
 builder.Services.AddControllers();
