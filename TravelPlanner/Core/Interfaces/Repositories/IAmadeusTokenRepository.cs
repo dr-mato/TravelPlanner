@@ -5,6 +5,6 @@ namespace TravelPlanner.Core.Interfaces.Repositories
     public interface IAmadeusTokenRepository: IRepository<AmadeusToken>
     {
         Task<AmadeusToken?> GetCurrentTokenAsync();
-        Task SaveTokenAsync(AmadeusToken token);
+        Task SaveTokenAsync();
     }
 }

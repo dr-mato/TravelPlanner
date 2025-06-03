@@ -23,30 +23,39 @@ namespace TravelPlanner.Application.Services
         public async Task<string> GetAITACodeAsync(AITARequest request)
         {
             var token = await _amadeusTokenGenerationService.GenerateAmadeusTokenAsync();
-            
-            var httpRequest = new HttpRequestMessage(HttpMethod.Get,
-                $"https://test.api.amadeus.com/v1/reference-data/locations?subType=CITY&keyword={request.City}");
 
-            httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
+            var existingAITA = await _aitaRepository.GetAITACodeAsync(request.City);
 
-            var response = await _httpClient.SendAsync(httpRequest);
-            response.EnsureSuccessStatusCode();
-
-            var responseBody = await response.Content.ReadAsStringAsync();
-
-            var jsonDocument = JsonDocument.Parse(responseBody);
-            string iataCode = jsonDocument.RootElement
-                .GetProperty("data")[0]
-                .GetProperty("iataCode")
-                .GetString();
-
-            await _aitaRepository.SaveCodeAsync(new AITA
+            if (existingAITA is null)
             {
-                City = request.City,
-                AITACode = iataCode
-            });
+                var httpRequest = new HttpRequestMessage(HttpMethod.Get,
+                    $"https://test.api.amadeus.com/v1/reference-data/locations?subType=CITY&keyword={request.City}");
 
-            return iataCode;
+                httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
+
+                var response = await _httpClient.SendAsync(httpRequest);
+                response.EnsureSuccessStatusCode();
+
+                var responseBody = await response.Content.ReadAsStringAsync();
+
+                var jsonDocument = JsonDocument.Parse(responseBody);
+                string iataCode = jsonDocument.RootElement
+                    .GetProperty("data")[0]
+                    .GetProperty("iataCode")
+                    .GetString();
+
+                await _aitaRepository.AddAsync(new AITA
+                {
+                    City = request.City,
+                    AITACode = iataCode
+                });
+                await _aitaRepository.SaveCodeAsync();
+                return iataCode;
+            }
+            else
+            {
+                return existingAITA.AITACode;
+            }
         }
     }
 }

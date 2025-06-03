@@ -16,9 +16,9 @@ namespace TravelPlanner.Infrastructure.Repositories
             return await _context.AmadeusTokens.FirstOrDefaultAsync();
         }
 
-        public async Task SaveTokenAsync(AmadeusToken token)
+        public async Task SaveTokenAsync()
         {
-            await _context.AmadeusTokens.AddAsync(token);
+            await _context.SaveChangesAsync();
         }
     }
 }

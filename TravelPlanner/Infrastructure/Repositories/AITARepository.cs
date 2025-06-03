@@ -14,12 +14,12 @@ namespace TravelPlanner.Infrastructure.Repositories
         public Task<AITA?> GetAITACodeAsync(string city)
         {
             return _context.AITAs
-                .FirstOrDefaultAsync(a => a.City.Equals(city, StringComparison.OrdinalIgnoreCase));
+                .FirstOrDefaultAsync(a => a.City.ToLower() == city.ToLower());
         }
 
-        public async Task SaveCodeAsync(AITA aita)
+        public async Task SaveCodeAsync()
         {
-            await _context.AITAs.AddAsync(aita);
+            await _context.SaveChangesAsync();
         }
     }
 }

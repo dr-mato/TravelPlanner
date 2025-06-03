@@ -59,7 +59,8 @@ namespace TravelPlanner.Application.Services
                         AccessToken = tokenResponse.Access_Token,
                         ExpirationTime = DateTime.UtcNow.AddSeconds(tokenResponse.Expires_In)
                     };
-                    await _tokenRepository.SaveTokenAsync(token);
+                    await _tokenRepository.AddAsync(token);
+                    await _tokenRepository.SaveTokenAsync();
                     return token;
                 }
                 else
@@ -67,6 +68,7 @@ namespace TravelPlanner.Application.Services
                     savedToken.AccessToken = tokenResponse.Access_Token;
                     savedToken.ExpirationTime = DateTime.UtcNow.AddSeconds(tokenResponse.Expires_In);
                     _tokenRepository.Update(savedToken);
+                    await _tokenRepository.SaveTokenAsync();
                     return savedToken;
                 }
             }
