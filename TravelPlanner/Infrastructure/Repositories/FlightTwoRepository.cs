@@ -11,10 +11,11 @@ namespace TravelPlanner.Infrastructure.Repositories
         {
         }
 
-        public async Task<IEnumerable<FlightTwo>> GetFlightsTwoInfoAsync(DateTime date, string origin, string destination, int passengers)
+        public async Task<IEnumerable<FlightTwo>> GetFlightsTwoInfoAsync(DateTime date, string origin, string destination,
+            int passengers, FlightTwoClass flightClass)
         {
             return await _context.FlightTwos.Where(flight => flight.Date == date && flight.OriginCity == origin &&
-            flight.DestinationCity == destination && flight.Passengers == passengers).ToListAsync();
+            flight.DestinationCity == destination && flight.Passengers == passengers && flight.Class == flightClass).ToListAsync();
         }
 
         public async Task SaveFlightAsync()

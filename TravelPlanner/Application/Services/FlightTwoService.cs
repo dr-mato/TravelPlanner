@@ -32,7 +32,7 @@ namespace TravelPlanner.Application.Services
             var destination = await _aitaService.GetAITACodeAsync(new AITARequest { City = request.DestinationCity });
             var token = await _amadeusTokenRepository.GetCurrentTokenAsync();
 
-            var SavedDepartureFlights = await _flightTwoRepository.GetFlightsTwoInfoAsync(request.DepartureDate, origin, destination, request.NumberOfPassengers);
+            var SavedDepartureFlights = await _flightTwoRepository.GetFlightsTwoInfoAsync(request.DepartureDate, origin, destination, request.NumberOfPassengers, request.Class);
 
             if (SavedDepartureFlights.Any())
             {
@@ -45,6 +45,7 @@ namespace TravelPlanner.Application.Services
                     $"&destinationLocationCode={destination}" +
                     $"&departureDate={request.DepartureDate:yyyy-MM-dd}" +
                     $"&adults={request.NumberOfPassengers}" +
+                    $"&travelClass={request.Class}" +
                     $"&max=9";
 
                 _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token.AccessToken);
@@ -80,7 +81,8 @@ namespace TravelPlanner.Application.Services
                         DestinationAirport = arrival.GetProperty("iataCode").GetString(),
                         Date = DateTime.Parse(departure.GetProperty("at").GetString()),
                         Price = priceAmount + priceCurrency,
-                        Passengers = request.NumberOfPassengers
+                        Passengers = request.NumberOfPassengers,
+                        Class = request.Class
                     };
 
                     await _flightTwoRepository.AddAsync(flight);
@@ -90,7 +92,7 @@ namespace TravelPlanner.Application.Services
                 await _flightTwoRepository.SaveFlightAsync();
             }
 
-            var SavedArrivalFlights = await _flightTwoRepository.GetFlightsTwoInfoAsync(request.ArrivalDate, destination, origin, request.NumberOfPassengers);
+            var SavedArrivalFlights = await _flightTwoRepository.GetFlightsTwoInfoAsync(request.ArrivalDate, destination, origin, request.NumberOfPassengers, request.Class);
 
             if (SavedArrivalFlights.Any())
             {
@@ -104,6 +106,7 @@ namespace TravelPlanner.Application.Services
                     $"&destinationLocationCode={origin}" +
                     $"&departureDate={request.ArrivalDate:yyyy-MM-dd}" +
                     $"&adults={request.NumberOfPassengers}" +
+                    $"&travelClass={request.Class}" +
                     $"&max=9";
 
                 _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token.AccessToken);
@@ -138,7 +141,8 @@ namespace TravelPlanner.Application.Services
                         DestinationAirport = arrival.GetProperty("iataCode").GetString(),
                         Date = DateTime.Parse(departure.GetProperty("at").GetString()),
                         Price = priceAmount + priceCurrency,
-                        Passengers = request.NumberOfPassengers
+                        Passengers = request.NumberOfPassengers,
+                        Class = request.Class
                     };
 
                     await _flightTwoRepository.AddAsync(flight);
