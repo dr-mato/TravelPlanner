@@ -1,0 +1,35 @@
+﻿namespace TravelPlanner.Core.Entities
+{
+    public enum Amenity
+    {
+        SWIMMING_POOL,
+        SPA,
+        FITNESS_CENTER,
+        AIR_CONDITIONING,
+        RESTAURANT,
+        PARKING,
+        PETS_ALLOWED,
+        AIRPORT_SHUTTLE,
+        BUSINESS_CENTER,
+        DISABLED_FACILITIES,
+        WIFI,
+        MEETING_ROOMS,
+        NO_KID_ALLOWED,
+        TENNIS,
+        GOLF,
+        KITCHEN,
+        ANIMAL_WATCHING,
+        BEACH,
+        CASINO,
+        JACUZZI,
+        SAUNA,
+        SOLARIUM,
+        MASSAGE,
+        VALET_PARKING,
+        KIDS_WELCOME,
+        MINIBAR,
+        TELEVISION,
+        ROOM_SERVICE,
+        GUARDED_PARKG,
+    }
+}

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 using TravelPlanner.Application.Services;
 using TravelPlanner.Core.Interfaces.Repositories;
 using TravelPlanner.Core.Interfaces.Services;
@@ -21,6 +22,12 @@ builder.Services.AddCors(options =>
 builder.Services.AddDbContext<DataDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
+
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IDestinationRepository, DestinationRepository>();
 builder.Services.AddScoped<IWeatherRepository, WeatherRepository>();
@@ -31,6 +38,7 @@ builder.Services.AddScoped<IHotelDestinationRepository, HotelDestinationReposito
 builder.Services.AddScoped<IAmadeusTokenRepository, AmadeusTokenRepository>();
 builder.Services.AddScoped<IAITARepository, AITARepository>();
 builder.Services.AddScoped<IFlightTwoRepository, FlightTwoRepository>();
+builder.Services.AddScoped<IHotelInfoTwoRepository, HotelInfoTwoRepository>();
 
 builder.Services.AddScoped<IOpenAIService, OpenAIService>();
 builder.Services.AddScoped<IWeatherService, WeatherService>();
@@ -39,6 +47,7 @@ builder.Services.AddScoped<IHotelService, HotelService>();
 builder.Services.AddScoped<IAmadeusTokenGenerationService, AmadeusTokenGenerationService>();
 builder.Services.AddScoped<IAITAService, AITAService>();
 builder.Services.AddScoped<IFlightTwoService, FlightTwoService>();
+builder.Services.AddScoped<IHotelListTwoService, HotelListTwoService>();
 
 builder.Services.AddHttpClient();
 builder.Services.AddControllers();
