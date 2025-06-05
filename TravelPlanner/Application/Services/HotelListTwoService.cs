@@ -25,6 +25,7 @@ namespace TravelPlanner.Application.Services
         public async Task<IEnumerable<HotelInfoTwo>> GetHotelInfoByCityAsync(HotelListTwoRequest request)
         {
             var savedHotels = await _hotelInfoTwoRepository.GetHotels(request);
+            var aitaCode = await _aitaService.GetAITACodeAsync(new AITARequest { City = request.City });
 
             if (savedHotels.Any())
             {
@@ -32,7 +33,6 @@ namespace TravelPlanner.Application.Services
             }
             else
             {
-                var aitaCode = await _aitaService.GetAITACodeAsync(new AITARequest { City = request.City });
                 var token = await _amadeusTokenRepository.GetCurrentTokenAsync();
 
                 var amenitiesQuery = request.Amenities != null && request.Amenities.Any()
@@ -49,11 +49,9 @@ namespace TravelPlanner.Application.Services
                 _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token.AccessToken);
 
                 var response = await _httpClient.GetAsync(url);
-                Console.WriteLine(response);
                 response.EnsureSuccessStatusCode();
 
                 var content = await response.Content.ReadAsStringAsync();
-                Console.WriteLine(content);
 
                 using var jsonDoc = JsonDocument.Parse(content);
                 var root = jsonDoc.RootElement;

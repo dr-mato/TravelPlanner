@@ -39,6 +39,7 @@ builder.Services.AddScoped<IAmadeusTokenRepository, AmadeusTokenRepository>();
 builder.Services.AddScoped<IAITARepository, AITARepository>();
 builder.Services.AddScoped<IFlightTwoRepository, FlightTwoRepository>();
 builder.Services.AddScoped<IHotelInfoTwoRepository, HotelInfoTwoRepository>();
+builder.Services.AddScoped<IHotelTwoRepository, HotelTwoRepository>();
 
 builder.Services.AddScoped<IOpenAIService, OpenAIService>();
 builder.Services.AddScoped<IWeatherService, WeatherService>();
@@ -48,6 +49,7 @@ builder.Services.AddScoped<IAmadeusTokenGenerationService, AmadeusTokenGeneratio
 builder.Services.AddScoped<IAITAService, AITAService>();
 builder.Services.AddScoped<IFlightTwoService, FlightTwoService>();
 builder.Services.AddScoped<IHotelListTwoService, HotelListTwoService>();
+builder.Services.AddScoped<IHotelTwoService, HotelTwoService>();   
 
 builder.Services.AddHttpClient();
 builder.Services.AddControllers();
