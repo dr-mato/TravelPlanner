@@ -27,5 +27,21 @@ namespace TravelPlanner.Controllers
             var dailyPlan = await _service.GetDailyPlanAsync(request);
             return Ok(dailyPlan);
         }
+
+        [HttpPost]
+        [Route("daily-plan-two")]
+        public async Task<IActionResult> GetDailyPlanTwo([FromBody] DailyPlanTwoRequest request)
+        {
+            var dailyPlan = await _service.GetDailyPlanTwoAsync(request);
+            return Ok(dailyPlan);
+        }
+
+        [HttpPost]
+        [Route("daily-plan-three")]
+        public async Task<IActionResult> GetDailyPlanThree([FromBody] DailyPlanThreeRequest request)
+        {
+            var dailyPlan = await _service.GetDailyPlanThreeAsync(request);
+            return Ok(dailyPlan);
+        }
     }
 }

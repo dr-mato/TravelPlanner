@@ -9,7 +9,7 @@
         public string DestinationAirport { get; set; }
         public DateTime Date { get; set; }
         public string Price { get; set; }
-        public int Passengers { get; set; }
+        public int Passengers { get; set; } 
         public FlightTwoClass Class { get; set; }
     }
 }
