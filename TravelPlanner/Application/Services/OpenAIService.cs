@@ -39,7 +39,7 @@ public class OpenAIService : IOpenAIService
 
         Example response:
         {{
-          ""Name"": ""Bali, Indonesia"",
+          ""City"": ""Bali"",
           ""Country"": ""Indonesia"",
           ""Summary"": ""A tropical paradise..."",
           ""BudgetEstimate"": 5000,

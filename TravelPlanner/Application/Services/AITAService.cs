@@ -34,6 +34,7 @@ namespace TravelPlanner.Application.Services
                 httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
 
                 var response = await _httpClient.SendAsync(httpRequest);
+                Console.WriteLine(response);
                 response.EnsureSuccessStatusCode();
 
                 var responseBody = await response.Content.ReadAsStringAsync();
